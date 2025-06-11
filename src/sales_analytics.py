@@ -45,7 +45,7 @@ class SalesAnalytics:
             c.age,
             i.item_name,
             CAST(SUM(o.quantity) AS INTEGER) as total_quantity
-        FROM Customer c
+        FROM Customers c
         INNER JOIN Sales s ON c.customer_id = s.customer_id
         INNER JOIN Orders o ON s.sales_id = o.sales_id
         INNER JOIN Items i ON o.item_id = i.item_id
@@ -72,7 +72,7 @@ class SalesAnalytics:
         # Pandas-based approach to extract and analyze customer purchases
         try:
             # Load all tables into pandas DataFrames
-            customers_df = pd.read_sql_query("SELECT * FROM Customer", self.connection)
+            customers_df = pd.read_sql_query("SELECT * FROM Customers", self.connection)
             sales_df = pd.read_sql_query("SELECT * FROM Sales", self.connection)
             orders_df = pd.read_sql_query("SELECT * FROM Orders", self.connection)
             items_df = pd.read_sql_query("SELECT * FROM Items", self.connection)
