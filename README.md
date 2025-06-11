@@ -1,110 +1,125 @@
-Sales Analytics Assignment
+# 📊 Sales Analytics – Purchase Pattern Extraction
 
-A Python application that analyzes sales data to extract customer purchase patterns for marketing strategy targeting specific age groups (18-35).
+This project analyzes sales transaction data to identify **purchase patterns of customers aged 18–35**, enabling targeted marketing strategies.
 
-Project Overview
+---
 
-Company XYZ held a promotional sale for their signature items (x, y, z) and wants to create a marketing strategy by analyzing total quantities purchased by different age groups.
+## 📁 Project Structure
 
-Business Requirements
-- Extract total quantities of each item bought per customer aged 18-35
-- Aggregate quantities across multiple transactions per customer
-- Exclude items with no purchases (NULL or zero quantities)
-- Output data without decimal points (whole numbers only)
-
-Database Schema
-
-The application works with a SQLite database containing these tables:
-
-- Customer: customer_id (PK), age
-- Sales: sales_id (PK), customer_id (FK)
-- Orders: order_id (PK), sales_id (FK), item_id (FK), quantity
-- Items: item_id (PK), item_name
-
-Features
-
-- Dual Implementation: Both pure SQL and Pandas approaches
-- Age Filtering: Targets customers aged 18-35 years
-- Data Aggregation: Sums quantities across multiple transactions
-- CSV Export: Semicolon-delimited output format
-- Result Verification: Compares both approaches for accuracy
-
-Project Structure
-
+```
 sales-analytics/
-├── src/
-│   └── sales_analytics.py     # Main application
+│
 ├── data/
-│   └──  Data Engineer_ETL Assignment 1.db      # Placeholder for database files
+│   └── Data Engineer_ETL Assignment 1.db   # SQLite DB file
+│
 ├── output/
-│   └──           # Generated CSV files location
-├── README.md
+│   ├── sql_sales_analysis.csv              # SQL results
+│   └── pandas_sales_analysis.csv           # Pandas results
+│
+├── sales_analytics.py                      # Main analysis script
+└── README.md                               # Project documentation
+```
+
+---
+
+## ⚙️ Requirements
+
+Install the required packages:
+
+```bash
+pip install pandas
+```
+
+Python version: **3.1+ recommended**
+
+---
+
+## 🚀 How to Run
+
+### Step 1: Update your paths
+
+In `main()` function of `sales_analytics.py`, set:
+
+```python
+db_path = "data/Data Engineer_ETL Assignment 1.db"
+output_path = "output"
+```
+
+### Step 2: Run the script
+
+```bash
+python sales_analytics.py
+```
+
+### ✅ Output
+
+After successful run, two CSV files will be generated inside the `output/` folder:
+
+- `sql_sales_analysis.csv` – Extracted using raw SQL queries
+- `pandas_sales_analysis.csv` – Extracted using Pandas transformations
+
+---
+
+## 📌 Script Usage Summary
+
+```python
+analytics = SalesAnalytics(db_path)
+analytics.connect_to_database()
+analytics.analyze_sales_data("sales_analysis.csv", output_dir="output")
+analytics.close_connection()
+```
+
+You can import the class and call methods individually for reuse in larger pipelines or notebooks.
+
+---
+
+## 🧠 Logic Details
+
+### 🔍 SQL Approach
+
+- Performs a multi-table join:
+  - `Customer` → `Sales` → `Orders` → `Items`
+- Filters only customers **aged between 18 and 35**
+- Aggregates total quantity per `(customer_id, item_name)`
+- Removes zero/null quantities
+- Final data sorted by `customer_id` and `item_name`
+
+**Advantages:** Fast, native to the database, minimal RAM usage  
+**Drawbacks:** Less flexible for dynamic transformations
+
+---
+
+### 📊 Pandas Approach
+
+- Loads all 4 tables into Pandas DataFrames
+- Applies age filter (`18 <= age <= 35`)
+- Performs inner joins using `.merge()`
+- Filters out:
+  - null quantities
+  - zero quantities
+- Groups by `(customer_id, item_name)` and **sums the quantities**
+- Cleans and sorts the final DataFrame before exporting
 
 
-Usage
+---
 
-Basic Usage
+## ✅ Verification
 
-from src.sales_analytics import SalesAnalytics
+Both approaches are compared at the end of the script using:
 
-# Initialize with your database path
-analytics = SalesAnalytics("data/Data Engineer_ETL Assignment 1.db")
+```python
+if sql_df.equals(pandas_df):
+    print("Both approaches produce identical results!")
+```
 
-# Update yout ouptput path in output_dir
+This ensures the **Pandas and SQL outputs are consistent** and reliable.
 
-# Connect to database
-if analytics.connect_to_database():
-    # Run analysis
-    analytics.analyze_sales_data("sales_results.csv")
-    analytics.close_connection()
+---
 
-Command Line Usage
+## 👨‍💻 Author
 
-python src/sales_analytics.py
+**Hemanth Aradhya B R**  
+📧 aradhyahemanth31@gmail.com
 
-Expected Output
-
-The application generates CSV files with this format:
-
-Customer;Age;Item;Quantity
-1;21;x;10
-2;23;x;1
-2;23;y;1
-2;23;z;1
-3;35;z;2
-
-Technical Implementation
-
-Solution 1: Pure SQL Approach
-- Uses SQL JOIN operations across all tables
-- Applies WHERE clause for age filtering
-- Groups data using GROUP BY with SUM aggregation
-- Filters out NULL/zero quantities with HAVING clause
-
-Solution 2: Pandas Approach
-- Reads tables into separate DataFrames
-- Applies age filtering using boolean indexing
-- Merges DataFrames using pandas merge operations
-- Groups and aggregates using groupby() and sum()
-
-Testing
-
-Run the test suite:
-
-python -m pytest tests/
-
-Requirements
-
-- Python 3.1+
-- pandas
-- sqlite3 (built-in)
-
-
-Assignment Context
-
-
-- SQL database interaction skills
-- Data analysis and manipulation techniques
-- Python programming best practices
-- Business requirement analysis and implementation
+---
 
